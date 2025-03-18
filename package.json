@@ -1,0 +1,47 @@
+{
+  "name": "term-project-group-20",
+  "version": "1.0.0",
+  "description": "[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=18604599)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/server/index.ts",
+    "start:dev": "nodemon --exec ts-node src/server/index.ts",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-group-20.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-group-20/issues"
+  },
+  "homepage": "https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-group-20#readme",
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.0",
+    "@types/http-errors": "^2.0.4",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.13.10",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.0.1",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
