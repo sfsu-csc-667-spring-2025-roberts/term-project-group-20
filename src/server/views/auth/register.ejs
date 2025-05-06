@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Uno</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      height: 600px;
+      border: 2px solid #333;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .title {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .signup-card {
+      width: 400px;
+      padding: 30px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    
+    .card-title {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #333;
+      border-radius: 20px;
+      font-size: 16px;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #333;
+      border-radius: 20px;
+      background-color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .divider {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    
+    .login-link {
+      display: block;
+      width: 100px;
+      padding: 10px;
+      border: 2px solid #333;
+      border-radius: 20px;
+      background-color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+      margin: 0 auto;
+      text-decoration: none;
+      color: #000;
+    }
+    
+    .error {
+      color: #e74c3c;
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="signup-content">
+      <h1 class="title">Sign Up</h1>
+      
+      <div class="signup-card">
+        <h2 class="card-title">Sign up to Play</h2>
+        
+        <% if (locals.error && error) { %>
+          <p class="error"><%= error %></p>
+        <% } %>
+        
+        <form class="auth-form" action="/auth/register" method="POST">
+          <div class="form-group">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              placeholder="Name"
+              <% if(locals.username && username) { %>
+                value="<%= username %>"
+              <% } %>
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="Email"
+              <% if(locals.email && email) { %>
+                value="<%= email %>"
+              <% } %>
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Password"
+              required
+            >
+          </div>
+          
+          <button type="submit" class="btn">Sign up</button>
+          
+          <div class="divider">OR</div>
+          
+          <a href="/auth/login" class="login-link">Login</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
