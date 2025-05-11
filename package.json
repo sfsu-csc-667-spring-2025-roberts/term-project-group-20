@@ -4,14 +4,30 @@
   "description": "[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=18604599)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/server/index.ts",
-    "start:dev": "nodemon --exec ts-node src/server/index.ts",
-    "prepare": "husky"
+    "start": "NODE_ENV=production ts-node src/server/index.ts",
+    "start:dev": "concurrently --names backend,frontend -c blue,green \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "nodemon --exec ts-node src/server/index.ts",
+    "frontend:dev": "parcel watch --dist-dir ./public/js",
+    "frontend": "parcel build",
+    "prepare": "husky",
+    "db:create": "node-pg-migrate create -j ts --",
+    "db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js up -j ts",
+    "db:rollback": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js down -j ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-group-20.git"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "targets": {
+    "chat": {
+      "source": "./src/client/chat/index.ts"
+    },
+    "games": {
+      "source": "./src/client/games/index.ts"
+    }
   },
   "keywords": [],
   "author": "",
@@ -21,14 +37,19 @@
   },
   "homepage": "https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-group-20#readme",
   "devDependencies": {
+    "@types/connect-livereload": "^0.6.3",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^5.0.0",
     "@types/http-errors": "^2.0.4",
+    "@types/livereload": "^0.9.5",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.10",
+    "connect-livereload": "^0.6.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
+    "livereload": "^0.9.3",
     "nodemon": "^3.1.9",
+    "parcel": "^2.14.4",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
@@ -39,9 +60,9 @@
     "ejs": "^3.1.10",
     "express": "^5.0.1",
     "http-errors": "^2.0.0",
-    "morgan": "^1.10.0"
-  },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+    "morgan": "^1.10.0",
+    "node-pg-migrate": "^7.9.1",
+    "pg": "^8.15.6",
+    "pg-promise": "^11.13.0"
   }
 }
