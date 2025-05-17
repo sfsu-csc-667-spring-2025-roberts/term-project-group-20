@@ -1,8 +1,11 @@
-<html></html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>Hello</title>
+    <title><%= title %></title>
+    <script src="/js/chat.js" defer></script>
   </head>
   <body>
     <p>Hello, welcome to <%= name %></p>
+   <%- include('auth/login') %> 
   </body>
 </html>

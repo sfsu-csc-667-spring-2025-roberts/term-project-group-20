@@ -3,11 +3,13 @@ import express from "express";
 import httpErrors from "http-errors";
 import morgan from "morgan";
 import * as path from "path";
-import * as routes from "./routes";
 import * as config from "./config";
+import * as routes from "./routes";
 
 import dotenv from "dotenv";
 dotenv.config();
+// //debuging check below
+// console.log("Database URL (from index.ts):", process.env.DATABASE_URL);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
