@@ -27,6 +27,8 @@ app.set("view engine", "ejs");
 // Routes
 app.use("/", routes.root);
 app.use("/test", routes.test);
+app.use("/auth", routes.auth);
+
 
 // Error handling
 app.use((_request, _response, next) => {
