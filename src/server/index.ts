@@ -32,6 +32,8 @@ app.use("/", routes.root);
 app.use("/test", routes.test);
 app.use("/auth", routes.auth);
 app.use('/lobby', routes.lobby);
+app.use('/games/create', routes.games); 
+
 
 
 
