@@ -2,6 +2,9 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import httpErrors from "http-errors";
 import morgan from "morgan";
+import * as http from "http";
+import { Server } from "socket.io";
+
 import * as path from "path";
 import * as config from "./config";
 import * as routes from "./routes";
@@ -13,9 +16,14 @@ dotenv.config();
 // console.log("Database URL (from index.ts):", process.env.DATABASE_URL);
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
 const PORT = process.env.PORT || 3000;
 
 config.liveReload(app);
+config.socket(io, app, config.session(app));
+
 config.session(app);
 // Middleware
 app.use(morgan("dev"));
