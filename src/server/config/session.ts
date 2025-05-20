@@ -12,7 +12,7 @@ const configureSession = (app: Express) => {
 
   const sessionMiddleware = session({
     store,
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || "dev-secret-key",
     resave: true,
     saveUninitialized: false,
   });
