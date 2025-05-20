@@ -5,6 +5,7 @@ import morgan from "morgan";
 import * as path from "path";
 import * as config from "./config";
 import * as routes from "./routes";
+import * as middleware from "./middleware";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -15,6 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 config.liveReload(app);
+config.session(app);
 // Middleware
 app.use(morgan("dev"));
 app.use(express.json());
@@ -32,6 +34,10 @@ app.use("/test", routes.test);
 app.use("/auth", routes.auth);
 app.use("/lobby", routes.lobby);
 app.use("/games/create", routes.games);
+
+// app.use("/chat", middleware.auth, routes.chat);
+app.use("/lobby", middleware.auth, routes.lobby);
+// app.use("/games", middleware.auth, routes.games);
 
 // Error handling
 app.use((_request, _response, next) => {

@@ -41,14 +41,14 @@ router.post("/login", async (request: Request, response: Response) => {
   }
 });
 
-// router.get("/logout", async (request: Request, response: Response) => {
-//   // @ts-ignore
-//   request.session.user = null;
-//   request.session.destroy(() => {
-//     // intentional no-op for now
-//   });
+router.get("/logout", async (request: Request, response: Response) => {
+  // @ts-ignore
+  request.session.user = null;
+  request.session.destroy(() => {
+    // intentional no-op for now
+  });
 
-//   response.redirect("/");
-// });
+  response.redirect("/");
+});
 
 export default router;
