@@ -6,6 +6,7 @@ import * as path from "path";
 import * as config from "./config";
 import * as routes from "./routes";
 
+
 import dotenv from "dotenv";
 dotenv.config();
 // //debuging check below
@@ -30,6 +31,9 @@ app.set("view engine", "ejs");
 app.use("/", routes.root);
 app.use("/test", routes.test);
 app.use("/auth", routes.auth);
+app.use('/lobby', routes.lobby);
+
+
 
 // Error handling
 app.use((_request, _response, next) => {
