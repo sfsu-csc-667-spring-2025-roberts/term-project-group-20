@@ -803,6 +803,7 @@ ${frame.code}`;
       function (require, module, exports, __globalThis) {
         // console.log("hello client!(chat sub-directory)");
         var _sockets = require("../sockets");
+        const chatContainer = document.querySelector("#chat-container div");
         (0, _sockets.socket).on(
           "chat:message:0",
           ({ message, sender, timestamp }) => {
@@ -811,6 +812,28 @@ ${frame.code}`;
               sender,
               timestamp,
             });
+            //debugging cant get the message to show up on the chat ui:
+            console.log("Sending message to server:", message);
+            const messageContainer = document.createElement("div");
+            messageContainer.classList.add("message");
+            const img = document.createElement("img");
+            img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
+            img.alt = `Gravatar for ${sender.email}`;
+            img.classList.add("avatar");
+            messageContainer.appendChild(img);
+            const messageContent = document.createElement("span");
+            messageContent.classList.add("message-content");
+            messageContent.innerText = message;
+            const messageTimestamp = document.createElement("span");
+            messageTimestamp.classList.add("message-timestamp");
+            messageTimestamp.innerText = new Date(
+              timestamp,
+            ).toLocaleTimeString();
+            messageContainer.appendChild(messageTimestamp);
+            messageContainer.appendChild(messageContent);
+            //note: "? just says if this is null dont do the rest"
+            // "! means ik this is not going to be null"
+            chatContainer.appendChild(messageContainer);
           },
         );
         const chatForm = document.querySelector("#chat-container form");
