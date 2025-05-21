@@ -43,7 +43,7 @@ app.use("/auth", routes.auth);
 app.use("/lobby", routes.lobby);
 app.use("/games/create", routes.games);
 
-// app.use("/chat", middleware.auth, routes.chat);
+app.use("/chat", middleware.auth, routes.chat);
 app.use("/lobby", middleware.auth, routes.lobby);
 // app.use("/games", middleware.auth, routes.games);
 
