@@ -1,58 +1,90 @@
-import cookieParser from "cookie-parser";
-import express from "express";
-import httpErrors from "http-errors";
-import morgan from "morgan";
-import * as http from "http";
-import { Server } from "socket.io";
+import cookieParser from "cookie-parser"
+import express from "express"
+import createError from "http-errors"
+import morgan from "morgan"
+import path from "path"
+import { createServer } from "http"
+import dotenv from "dotenv"
+import session from "express-session"
+import pgSession from "connect-pg-simple"
 
-import * as path from "path";
-import * as config from "./config";
-import * as routes from "./routes";
-import * as middleware from "./middleware";
+// Load environment variables
+dotenv.config()
 
-import dotenv from "dotenv";
-dotenv.config();
-// //debuging check below
-// console.log("Database URL (from index.ts):", process.env.DATABASE_URL);
+// Import routes and middleware
+import routes from "./routes"
+import configureSocket from "./config/socket"
+import db from "./db/connection"
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+// Create Express app
+const app = express()
+const server = createServer(app)
 
-const PORT = process.env.PORT || 3000;
+// Configure session
+const PgSession = pgSession(session)
+const sessionMiddleware = session({
+  store: new PgSession({
+    pgPromise: db,
+    createTableIfMissing: true,
+    tableName: "session",
+  }),
+  secret: process.env.SESSION_SECRET || "uno-game-secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  },
+})
 
-config.liveReload(app);
-config.socket(io, app, config.session(app));
+// Configure Socket.io
+const { io, broadcastGameUpdate } = configureSocket(server)
 
-config.session(app);
-// Middleware
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(process.cwd(), "src", "public")));
-app.use(cookieParser());
+// Make socket.io available to routes
+app.set("io", io)
+app.set("broadcastGameUpdate", broadcastGameUpdate)
 
 // View engine setup
-app.set("views", path.join(process.cwd(), "src", "server", "views"));
-app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"))
+app.set("view engine", "ejs")
+
+// Middleware
+app.use(morgan("dev"))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, "public")))
+app.use(sessionMiddleware)
+
+// Share session with Socket.io
+// @ts-ignore
+io.use((socket, next) => {
+  // @ts-ignore
+  sessionMiddleware(socket.request, {}, next)
+})
 
 // Routes
-app.use("/", routes.root);
-app.use("/test", routes.test);
-app.use("/auth", routes.auth);
-app.use("/lobby", routes.lobby);
-app.use("/games/create", routes.games);
+app.use("/", routes)
 
-app.use("/chat", middleware.auth, routes.chat);
-app.use("/lobby", middleware.auth, routes.lobby);
-// app.use("/games", middleware.auth, routes.games);
+// Catch 404 and forward to error handler
+app.use((req, res, next) => {
+  next(createError(404))
+})
 
-// Error handling
-app.use((_request, _response, next) => {
-  next(httpErrors(404));
-});
+// Error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Set locals, only providing error in development
+  res.locals.message = err.message
+  res.locals.error = req.app.get("env") === "development" ? err : {}
+
+  // Render the error page
+  res.status(err.status || 500)
+  res.render("error", { error: err })
+})
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3000
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+})
+
+export default app

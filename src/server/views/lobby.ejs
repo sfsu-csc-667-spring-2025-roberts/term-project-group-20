@@ -1,280 +1,563 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lobby - Uno</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<%- include('./shared/head') %>
+
+<div class="lobby-container">
+  <div class="lobby-header">
+    <h1>Game Lobby</h1>
+    <p>Join an existing game or create a new one</p>
+  </div>
+  
+  <% if (locals.error) { %>
+    <div class="alert alert-danger">
+      <%= error %>
+    </div>
+  <% } %>
+  
+  <% if (locals.success) { %>
+    <div class="alert alert-success">
+      <%= success %>
+    </div>
+  <% } %>
+  
+  <div class="lobby-actions">
+    <a href="/games/create" class="btn btn-primary">Create New Game</a>
+    <button id="refresh-games" class="btn btn-outline">Refresh Games</button>
+  </div>
+  
+  <div class="games-container">
+    <h2>Available Games</h2>
     
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #f5f5f5;
-    }
-    .logo {
-    height: 50px; 
-    margin-right: 15px;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      height: 600px;
-      border: 2px solid #333;
-      background-color: #fff;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      border-bottom: 2px solid #333;
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-    }
-    
-    .logo {
-      font-size: 28px;
-      font-weight: bold;
-      border: 2px solid #333;
-      border-radius: 50%;
-      padding: 5px 10px;
-      margin-right: 15px;
-    }
-    
-    .welcome {
-      font-size: 18px;
-    }
-    
-    .header-right {
-      display: flex;
-      align-items: center;
-    }
-    
-    .header-right span {
-      margin-right: 10px;
-    }
-    
-    .btn {
-      padding: 8px 15px;
-      border: 2px solid #333;
-      border-radius: 20px;
-      background-color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #000;
-      margin-left: 10px;
-    }
-    
-    .main-content {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-    
-    .rooms-section {
-      flex: 2;
-      padding: 15px;
-      border-right: 2px solid #333;
-      overflow-y: auto;
-    }
-    
-    .rooms-header {
-      font-size: 20px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-    }
-    
-    .room-list {
-      list-style: none;
-    }
-    
-    .room-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .room-info {
-      flex: 3;
-    }
-    
-    
-    .join-btn {
-      flex: 1;
-      padding: 6px 12px;
-      border: 2px solid #333;
-      border-radius: 15px;
-      background-color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      color: #000;
-    }
-    
-    .chat-section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-left: 2px solid #333;
-      overflow: hidden;
-    }
-    
-    .chat-header {
-      padding: 10px 15px;
-      font-size: 18px;
-      border-bottom: 1px solid #ccc;
-    }
-    
-    .chat-messages {
-      flex: 1;
-      padding: 10px 15px;
-      overflow-y: auto;
-    }
-    
-    .message {
-      margin-bottom: 10px;
-      padding: 5px 0;
-    }
-    
-    .message-sender {
-      font-weight: bold;
-      margin-bottom: 3px;
-    }
-    
-    .message-text {
-      background-color: #f1f1f1;
-      padding: 8px 10px;
-      border-radius: 15px;
-      display: inline-block;
-    }
-    
-    .chat-input {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-    }
-    
-    .chat-input input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 2px solid #333;
-      border-radius: 20px;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-    
-    .chat-input button {
-      padding: 8px 15px;
-      border: 2px solid #333;
-      border-radius: 20px;
-      background-color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="header-left">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO" class="logo">
-        <div class="welcome">Welcome, <%= locals.username || 'Guest' %></div>
+    <div class="games-filter">
+      <div class="filter-group">
+        <label for="filter-status">Status:</label>
+        <select id="filter-status" class="filter-select">
+          <option value="all">All Games</option>
+          <option value="waiting">Waiting for Players</option>
+          <option value="active">In Progress</option>
+        </select>
       </div>
-      <div class="header-right">
-        <span>Game Creation</span>
-        <a href="/games/create" class="btn">Create Game</a>
-        <a href="/auth/login" class="btn">Log Out</a>
+      
+      <div class="search-group">
+        <input type="text" id="search-games" placeholder="Search games..." class="search-input">
       </div>
     </div>
     
-    <div class="main-content">
-      <div class="rooms-section">
-        <h2 class="rooms-header">Available Rooms</h2>
-        <ul class="room-list">
-          <% 
-          // Some placeholder
-          const rooms = [
-            { id: 1, players: 1, maxPlayers: 4, status: 'Waiting' },
-            { id: 2, players: 4, maxPlayers: 4, status: 'In Game' }
-            
-          ];
-          %>
-          
-          <% rooms.forEach(room => { %>
-            <li class="room-item">
-              <div class="room-info">
-                <div>Room #<%= room.id %> (<%= room.players %>/<%= room.maxPlayers %>)</div>
-                <div class="room-status <%= room.status.toLowerCase().replace(' ', '-') %>">
-                  <%= room.status %>
-                </div>
+    <div class="games-list" id="games-list">
+      <% if (games.length === 0) { %>
+        <div class="no-games">
+          <p>No games available. Create a new game to get started!</p>
+        </div>
+      <% } else { %>
+        <% games.forEach(game => { %>
+          <div class="game-card" data-status="<%= game.started ? 'active' : 'waiting' %>">
+            <div class="game-info">
+              <h3 class="game-name"><%= game.name %></h3>
+              <div class="game-details">
+                <span class="game-players"><%= game.player_count %> / <%= game.max_players %> players</span>
+                <span class="game-status <%= game.started ? 'status-active' : 'status-waiting' %>">
+                  <%= game.started ? 'In Progress' : 'Waiting for Players' %>
+                </span>
               </div>
-              <% if (room.status === 'Waiting') { %>
-                <a href="/games/join/<%= room.id %>" class="join-btn">Join</a>
-              <% } %>
-            </li>
-          <% }); %>
-        </ul>
-      </div>
-      
-      <div class="chat-section">
-        <div class="chat-header">
-          Live Chat
-        </div>
-        <div class="chat-messages">
-          <% 
-          // Some placeholder
-          const messages = [
-            { sender: 'Player1', text: 'placeholder' }
-          ];
-          %>
-          
-          <% messages.forEach(message => { %>
-            <div class="message">
-              <div class="message-sender"><%= message.sender %>:</div>
-              <div class="message-text"><%= message.text %></div>
+              <div class="game-meta">
+                <span class="game-created">Created <%= new Date(game.created_at).toLocaleString() %></span>
+                <% if (game.password) { %>
+                  <span class="game-private">Password Protected</span>
+                <% } %>
+              </div>
             </div>
-          <% }); %>
-        </div>
-        <div class="chat-input">
-          <input type="text" placeholder="Type a message...">
-          <button type="button">Send</button>
-        </div>
-      </div>
+            <div class="game-actions">
+              <% if (game.player_count < game.max_players && !game.started) { %>
+                <% if (game.password) { %>
+                  <button class="btn btn-primary join-game-btn" data-id="<%= game.id %>" data-password="true">Join Game</button>
+                <% } else { %>
+                  <a href="/games/<%= game.id %>/join" class="btn btn-primary">Join Game</a>
+                <% } %>
+              <% } else if (game.started && game.is_player) { %>
+                <a href="/games/<%= game.id %>" class="btn btn-primary">Resume Game</a>
+              <% } else if (game.started) { %>
+                <button class="btn btn-disabled" disabled>Game in Progress</button>
+              <% } else { %>
+                <button class="btn btn-disabled" disabled>Game Full</button>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
     </div>
   </div>
+</div>
 
-  <script>
-    document.querySelector('.chat-input button').addEventListener('click', function() {
-      const input = document.querySelector('.chat-input input');
-      const message = input.value.trim();
-      
-      if (message) {
-        // Display the message, but it is not working with authentication
-        console.log('Message sent:', message);
-        input.value = '';
+<!-- Password Modal -->
+<div id="password-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Enter Game Password</h2>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="password-form">
+        <input type="hidden" id="game-id" name="gameId">
+        <div class="form-group">
+          <label for="game-password">Password:</label>
+          <input type="password" id="game-password" name="password" class="form-control" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Join Game</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Filter and search functionality
+    const filterStatus = document.getElementById('filter-status');
+    const searchInput = document.getElementById('search-games');
+    const gamesList = document.getElementById('games-list');
+    const gameCards = document.querySelectorAll('.game-card');
+    const refreshBtn = document.getElementById('refresh-games');
+    
+    // Password modal elements
+    const passwordModal = document.getElementById('password-modal');
+    const passwordForm = document.getElementById('password-form');
+    const gameIdInput = document.getElementById('game-id');
+    const closeModal = document.querySelector('.close-modal');
+    const cancelBtn = document.querySelector('.cancel-btn');
+    const joinGameBtns = document.querySelectorAll('.join-game-btn');
+    
+    // Filter games by status
+    if (filterStatus) {
+      filterStatus.addEventListener('change', filterGames);
+    }
+    
+    // Search games by name
+    if (searchInput) {
+      searchInput.addEventListener('input', filterGames);
+    }
+    
+    // Refresh games list
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function() {
+        window.location.reload();
+      });
+    }
+    
+    // Open password modal
+    if (joinGameBtns.length > 0) {
+      joinGameBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const gameId = this.getAttribute('data-id');
+          gameIdInput.value = gameId;
+          passwordModal.style.display = 'block';
+        });
+      });
+    }
+    
+    // Close password modal
+    if (closeModal) {
+      closeModal.addEventListener('click', function() {
+        passwordModal.style.display = 'none';
+      });
+    }
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function() {
+        passwordModal.style.display = 'none';
+      });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+      if (passwordModal && event.target === passwordModal) {
+        passwordModal.style.display = 'none';
       }
     });
-  </script>
-</body>
-</html>
+    
+    // Submit password form
+    if (passwordForm) {
+      passwordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const gameId = gameIdInput.value;
+        const password = document.getElementById('game-password').value;
+        
+        fetch(`/games/${gameId}/join`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = `/games/${gameId}`;
+          } else {
+            alert(data.error || 'Failed to join game');
+          }
+        })
+        .catch(error => {
+          console.error('Error joining game:', error);
+          alert('Failed to join game');
+        });
+      });
+    }
+    
+    function filterGames() {
+      if (!gameCards || gameCards.length === 0) return;
+      
+      const statusFilter = filterStatus ? filterStatus.value : 'all';
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+      
+      gameCards.forEach(card => {
+        const gameStatus = card.getAttribute('data-status');
+        const gameName = card.querySelector('.game-name').textContent.toLowerCase();
+        
+        let statusMatch = true;
+        if (statusFilter !== 'all') {
+          statusMatch = gameStatus === statusFilter;
+        }
+        
+        const nameMatch = gameName.includes(searchTerm);
+        
+        if (statusMatch && nameMatch) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Show no games message if all are filtered out
+      const visibleGames = document.querySelectorAll('.game-card[style="display: flex"]');
+      const noGamesMessage = document.querySelector('.no-games');
+      
+      if (visibleGames.length === 0 && !noGamesMessage && gamesList) {
+        const noGamesDiv = document.createElement('div');
+        noGamesDiv.className = 'no-games';
+        noGamesDiv.innerHTML = '<p>No games match your filters.</p>';
+        gamesList.appendChild(noGamesDiv);
+      } else if (visibleGames.length > 0 && noGamesMessage) {
+        noGamesMessage.remove();
+      }
+    }
+  });
+</script>
+
+<style>
+  .lobby-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .lobby-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .lobby-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .lobby-header p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .lobby-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0c7cd5;
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: #1890ff;
+    border: 2px solid #1890ff;
+  }
+  
+  .btn-outline:hover {
+    background-color: rgba(24, 144, 255, 0.1);
+  }
+  
+  .btn-disabled {
+    background-color: #d9d9d9;
+    color: #666;
+    cursor: not-allowed;
+  }
+  
+  .games-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  .games-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .games-filter {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-select {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  .search-input {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 250px;
+  }
+  
+  .games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .game-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    transition: transform 0.3s;
+  }
+  
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .game-info {
+    flex: 1;
+  }
+  
+  .game-name {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .game-details {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .game-players {
+    font-weight: 500;
+  }
+  
+  .game-status {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .status-waiting {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+  
+  .status-active {
+    background-color: #f6ffed;
+    color: #52c41a;
+  }
+  
+  .game-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .game-private {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .game-private::before {
+    content: "🔒";
+  }
+  
+  .no-games {
+    text-align: center;
+    padding: 30px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #666;
+  }
+  
+  .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+  }
+  
+  .alert-danger {
+    background-color: #fff1f0;
+    border: 1px solid #ffccc7;
+    color: #cf1322;
+  }
+  
+  .alert-success {
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    color: #52c41a;
+  }
+  
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    animation: modalFadeIn 0.3s;
+  }
+  
+  .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .close-modal {
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .close-modal:hover {
+    color: #333;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .lobby-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .games-filter {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-input {
+      width: 100%;
+    }
+    
+    .game-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .game-actions {
+      width: 100%;
+      margin-top: 15px;
+    }
+    
+    .game-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<%- include('./shared/menu') %>

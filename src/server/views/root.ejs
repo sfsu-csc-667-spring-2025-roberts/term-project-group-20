@@ -1,10 +1,339 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <title><%= title %></title>
-    <script src="/js/chat.js" defer></script>
-  </head>
-  <body>
-   <%- include('auth/login') %> 
-  </body>
-</html>
+<%- include('./shared/head') %>
+
+<div class="home-container">
+  <div class="hero-section">
+    <div class="hero-content">
+      <img src="/images/UNO.png" alt="UNO Logo" class="hero-logo">
+      <h1>Welcome to UNO Online</h1>
+      <p class="hero-subtitle">Play the classic card game with friends online!</p>
+      
+      <div class="hero-actions">
+        <% if (locals.user) { %>
+          <a href="/lobby" class="btn btn-primary btn-lg">Enter Game Lobby</a>
+          <a href="/auth/logout" class="btn btn-outline">Logout</a>
+        <% } else { %>
+          <a href="/auth/login" class="btn btn-primary btn-lg">Login</a>
+          <a href="/auth/register" class="btn btn-secondary btn-lg">Register</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="features-section">
+    <div class="section-title">
+      <h2>Game Features</h2>
+      <p>Experience the classic UNO game with modern online features</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <h3>Real-Time Gameplay</h3>
+        <p>Play with friends in real-time with instant updates and smooth gameplay</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>In-Game Chat</h3>
+        <p>Chat with other players during the game to enhance the social experience</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Private Games</h3>
+        <p>Create password-protected games to play only with your friends</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Play Anywhere</h3>
+        <p>Access the game from any device with a web browser</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="how-to-play-section">
+    <div class="section-title">
+      <h2>How to Play</h2>
+      <p>Quick guide to get started with UNO Online</p>
+    </div>
+    
+    <div class="steps-container">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Create an Account</h3>
+        <p>Register with your email to access all game features</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Join or Create a Game</h3>
+        <p>Enter the lobby to join an existing game or create your own</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Invite Friends</h3>
+        <p>Share the game link with friends to play together</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>Play and Win!</h3>
+        <p>Follow the classic UNO rules to be the first to get rid of all your cards</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="cta-section">
+    <h2>Ready to Play?</h2>
+    <p>Join thousands of players already enjoying UNO Online</p>
+    
+    <% if (locals.user) { %>
+      <a href="/lobby" class="btn btn-primary btn-lg">Go to Lobby</a>
+    <% } else { %>
+      <a href="/auth/register" class="btn btn-primary btn-lg">Get Started</a>
+    <% } %>
+  </div>
+</div>
+
+<style>
+  .home-container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .hero-section {
+    background: linear-gradient(135deg, #ff4d4f 0%, #1890ff 50%, #52c41a 100%);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+  }
+  
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .hero-logo {
+    max-width: 200px;
+    margin-bottom: 20px;
+  }
+  
+  .hero-section h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+  }
+  
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  
+  .btn-lg {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+    border: 2px solid #1890ff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0c7cd5;
+    border-color: #0c7cd5;
+  }
+  
+  .btn-secondary {
+    background-color: #52c41a;
+    color: white;
+    border: 2px solid #52c41a;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #389e0d;
+    border-color: #389e0d;
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+  
+  .btn-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .section-title {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  .section-title h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .section-title p {
+    font-size: 1.2rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .features-section {
+    padding: 80px 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .feature-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: transform 0.3s;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .feature-card p {
+    color: #666;
+    line-height: 1.6;
+  }
+  
+  .how-to-play-section {
+    padding: 80px 20px;
+    background-color: white;
+  }
+  
+  .steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .step-card {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .step-number {
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    width: 40px;
+    height: 40px;
+    background-color: #1890ff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .step-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+    margin-top: 10px;
+  }
+  
+  .step-card p {
+    color: #666;
+    line-height: 1.6;
+  }
+  
+  .cta-section {
+    background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+  }
+  
+  .cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .hero-section h1 {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.2rem;
+    }
+    
+    .section-title h2 {
+      font-size: 2rem;
+    }
+    
+    .cta-section h2 {
+      font-size: 2rem;
+    }
+  }
+</style>
+
+<%- include('./shared/menu') %>

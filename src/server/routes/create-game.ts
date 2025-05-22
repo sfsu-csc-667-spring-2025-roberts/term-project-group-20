@@ -1,27 +1,57 @@
-import express, { Request, Response } from "express";
-const router = express.Router();
+import express, { type Request, type Response } from "express"
+import db from "../db/connection"
+import auth from "../middleware/auth"
+
+const router = express.Router()
 
 // Route to render the create game page
-router.get("/", (req: Request, res: Response) => {
-  res.render("create-game");
-});
+router.get("/", auth, (req: Request, res: Response) => {
+  res.render("create-game")
+})
 
-router.post("/", (req: Request, res: Response) => {
+router.post("/", auth, async (req: Request, res: Response) => {
   // Extract form data
-  const { gameName, maxPlayers } = req.body;
+  const { gameName, maxPlayers } = req.body
 
   if (!gameName || !maxPlayers) {
     return res.render("create-game", {
       error: "Game name and max players are required",
       formData: req.body,
-    });
+    })
   }
 
+  try {
+    // @ts-ignore
+    const userId = req.session.user.id
 
-  const gameId = Date.now().toString();
+    // Create a new game
+    const game = await db.one(
+      `
+      INSERT INTO games (name, max_players, created_by, is_active)
+      VALUES ($1, $2, $3, true)
+      RETURNING id
+    `,
+      [gameName, maxPlayers, userId],
+    )
 
-  // Redirect to the waiting room or game page
-  res.redirect("/games/waiting-room/" + gameId);
-});
+    // Add the creator as the first player
+    await db.none(
+      `
+      INSERT INTO game_users (game_id, user_id, seat, is_current)
+      VALUES ($1, $2, 0, true)
+    `,
+      [game.id, userId],
+    )
 
-export default router;
+    // Redirect to the game waiting room
+    res.redirect(`/games/${game.id}`)
+  } catch (error) {
+    console.error("Error creating game:", error)
+    res.render("create-game", {
+      error: "Failed to create game. Please try again.",
+      formData: req.body,
+    })
+  }
+})
+
+export default router

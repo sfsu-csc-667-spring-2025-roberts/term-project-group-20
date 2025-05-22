@@ -1,192 +1,352 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Game - Uno</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<%- include('./shared/head') %>
+
+<div class="create-game-container">
+  <div class="create-game-header">
+    <h1>Create New Game</h1>
+    <p>Set up your UNO game and invite friends to play</p>
+  </div>
+  
+  <% if (locals.error) { %>
+    <div class="alert alert-danger">
+      <%= error %>
+    </div>
+  <% } %>
+  
+  <div class="create-game-form-container">
+    <form action="/games/create" method="POST" class="create-game-form">
+      <div class="form-group">
+        <label for="name">Game Name</label>
+        <input type="text" id="name" name="name" class="form-control" required autofocus>
+        <small class="form-text">Choose a unique name for your game</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="min_players">Minimum Players</label>
+        <select id="min_players" name="min_players" class="form-control">
+          <option value="2">2 Players</option>
+          <option value="3">3 Players</option>
+          <option value="4">4 Players</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="max_players">Maximum Players</label>
+        <select id="max_players" name="max_players" class="form-control">
+          <option value="2">2 Players</option>
+          <option value="3">3 Players</option>
+          <option value="4">4 Players</option>
+          <option value="6">6 Players</option>
+          <option value="8">8 Players</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password (Optional)</label>
+        <input type="password" id="password" name="password" class="form-control">
+        <small class="form-text">Leave blank for a public game</small>
+      </div>
+      
+      <div class="form-actions">
+        <a href="/lobby" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Game</button>
+      </div>
+    </form>
     
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #f5f5f5;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      height: 600px;
-      border: 2px solid #333;
-      background-color: #fff;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      border-bottom: 2px solid #333;
-    }
-    
-    .title {
-      text-align: center;
-      font-size: 32px;
-      font-weight: bold;
-      position: absolute;
-      width: 100%;
-      top: 20px;
-      left: 0;
-      z-index: 1;
-    }
-    
-    .logo {
-      font-size: 28px;
-      font-weight: bold;
-      border: 2px solid #333;
-      border-radius: 50%;
-      padding: 5px 10px;
-      z-index: 2;
-    }
-    
-    .nav-buttons {
-      display: flex;
-      gap: 10px;
-      z-index: 2;
-    }
-    
-    .btn {
-      padding: 8px 15px;
-      border: 2px solid #333;
-      border-radius: 20px;
-      background-color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #000;
-    }
-    .logo {
-    height: 50px; 
-    margin-right: 15px;
-    }
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-    }
-    
-    .create-form {
-      width: 100%;
-      max-width: 500px;
-    }
-    
-    .form-group {
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .form-group label {
-      width: 200px;
-      font-size: 18px;
-      margin-right: 15px;
-    }
-    
-    .form-group input {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #333;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    
-    .start-btn {
-      display: block;
-      width: 200px;
-      padding: 12px;
-      border: 2px solid #333;
-      border-radius: 20px;
-      background-color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      text-align: center;
-      margin: 30px auto 0;
-    }
-    
-    .error {
-      color: #e74c3c;
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO" class="logo">
-      <h1 class="title">Create Game</h1>
-      <div class="nav-buttons">
-        <a href="/lobby" class="btn">Back to lobby</a>
-        <a href="/auth/login" class="btn">Log out</a>
+    <div class="game-rules">
+      <h2>Game Rules</h2>
+      <div class="rules-content">
+        <h3>Basic Rules</h3>
+        <ul>
+          <li>Each player starts with 7 cards</li>
+          <li>Match cards by color or number</li>
+          <li>First player to get rid of all cards wins</li>
+        </ul>
+        
+        <h3>Special Cards</h3>
+        <div class="special-cards">
+          <div class="special-card">
+            <div class="card-example skip">Skip</div>
+            <p>Skip the next player's turn</p>
+          </div>
+          
+          <div class="special-card">
+            <div class="card-example reverse">Reverse</div>
+            <p>Reverse the direction of play</p>
+          </div>
+          
+          <div class="special-card">
+            <div class="card-example draw-two">+2</div>
+            <p>Next player draws 2 cards and loses turn</p>
+          </div>
+          
+          <div class="special-card">
+            <div class="card-example wild">Wild</div>
+            <p>Play on any card and choose the color</p>
+          </div>
+          
+          <div class="special-card">
+            <div class="card-example wild-draw-four">+4</div>
+            <p>Choose color and next player draws 4 cards</p>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <div class="content">
-      <% if (locals.error && error) { %>
-        <p class="error"><%= error %></p>
-      <% } %>
-
-      <%# Game Creation %>
-      <form class="create-form" action="/games/create" method="POST">
-        <div class="form-group">
-        
-          <label for="gameName">Game Name</label>
-          <input 
-            type="text" 
-            id="gameName" 
-            name="gameName" 
-            <% if (locals.formData && formData.gameName) { %>
-              value="<%= formData.gameName %>"
-            <% } %>
-            required
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="maxPlayers">Max # of Players</label>
-          <input 
-            type="number" 
-            id="maxPlayers" 
-            name="maxPlayers" 
-            min="2" 
-            max="10" 
-            <% if (locals.formData && formData.maxPlayers) { %>
-              value="<%= formData.maxPlayers %>"
-            <% } else { %>
-              value="4"
-            <% } %>
-            required
-          >
-        </div>
-        
-        <button type="submit" class="start-btn">Start Game</button>
-      </form>
-    </div>
   </div>
-</body>
-</html>
+</div>
+
+<style>
+  .create-game-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .create-game-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .create-game-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .create-game-header p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .create-game-form-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  
+  .create-game-form {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .form-control:focus {
+    border-color: #1890ff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+  }
+  
+  .form-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0c7cd5;
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: #1890ff;
+    border: 2px solid #1890ff;
+  }
+  
+  .btn-outline:hover {
+    background-color: rgba(24, 144, 255, 0.1);
+  }
+  
+  .game-rules {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  .game-rules h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .rules-content h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .rules-content ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+  }
+  
+  .rules-content li {
+    margin-bottom: 10px;
+  }
+  
+  .special-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  .special-card {
+    text-align: center;
+  }
+  
+  .card-example {
+    width: 80px;
+    height: 120px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .skip {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .reverse {
+    background-color: #52c41a;
+    color: white;
+  }
+  
+  .draw-two {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .wild {
+    background: linear-gradient(45deg, #ff4d4f, #1890ff, #52c41a, #fadb14);
+    color: white;
+  }
+  
+  .wild-draw-four {
+    background: linear-gradient(45deg, #ff4d4f, #1890ff, #52c41a, #fadb14);
+    color: white;
+    position: relative;
+  }
+  
+  .wild-draw-four::after {
+    content: "+4";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .special-card p {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+  }
+  
+  .alert-danger {
+    background-color: #fff1f0;
+    border: 1px solid #ffccc7;
+    color: #cf1322;
+  }
+  
+  @media (max-width: 768px) {
+    .create-game-form-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .form-actions .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const minPlayersSelect = document.getElementById('min_players');
+    const maxPlayersSelect = document.getElementById('max_players');
+    
+    // Update max players when min players changes
+    if (minPlayersSelect && maxPlayersSelect) {
+      minPlayersSelect.addEventListener('change', function() {
+        const minPlayers = parseInt(this.value);
+        
+        // Remove all options from max players
+        while (maxPlayersSelect.firstChild) {
+          maxPlayersSelect.removeChild(maxPlayersSelect.firstChild);
+        }
+        
+        // Add new options based on min players
+        for (let i = minPlayers; i <= 8; i++) {
+          if (i === 5 || i === 7) continue; // Skip 5 and 7 players
+          
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i + ' Players';
+          maxPlayersSelect.appendChild(option);
+        }
+      });
+    }
+  });
+</script>
+
+<%- include('./shared/menu') %>

@@ -1,11 +1,230 @@
-<menu>
-  <a href="/lobby">Lobby</a>
-  <div class="menu">
-    <a href="/auth/logout">Logout</a>
-    <img
-      src="https://gravatar.com/avatar/<%= user.gravatar %>?d=identicon"
-      alt="User Avatar"
-      class="gravatar"
-    />
+<nav class="main-nav">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <a href="/">
+        <img src="/images/UNO.png" alt="UNO Logo" class="nav-logo-img">
+        <span>UNO Online</span>
+      </a>
+    </div>
+    
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <% if (locals.user) { %>
+        <a href="/lobby" class="nav-link">Game Lobby</a>
+        <div class="nav-user">
+          <img src="https://www.gravatar.com/avatar/<%= user.gravatar %>?d=identicon" alt="User Avatar" class="nav-avatar">
+          <span class="nav-username"><%= user.email.split('@')[0] %></span>
+          <div class="nav-dropdown">
+            <a href="/profile" class="dropdown-item">Profile</a>
+            <a href="/auth/logout" class="dropdown-item">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/auth/login" class="nav-link">Login</a>
+        <a href="/auth/register" class="nav-link nav-link-highlight">Register</a>
+      <% } %>
+    </div>
+    
+    <button class="mobile-menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
-</menu>
+</nav>
+
+<div class="mobile-menu">
+  <a href="/" class="mobile-link">Home</a>
+  <% if (locals.user) { %>
+    <a href="/lobby" class="mobile-link">Game Lobby</a>
+    <a href="/profile" class="mobile-link">Profile</a>
+    <a href="/auth/logout" class="mobile-link">Logout</a>
+  <% } else { %>
+    <a href="/auth/login" class="mobile-link">Login</a>
+    <a href="/auth/register" class="mobile-link">Register</a>
+  <% } %>
+</div>
+
+<style>
+  .main-nav {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+  }
+  
+  .nav-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .nav-logo-img {
+    height: 30px;
+    margin-right: 10px;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  .nav-link:hover {
+    color: #1890ff;
+  }
+  
+  .nav-link-highlight {
+    background-color: #1890ff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+  
+  .nav-link-highlight:hover {
+    background-color: #0c7cd5;
+    color: white;
+  }
+  
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .nav-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+  
+  .nav-username {
+    font-weight: 500;
+  }
+  
+  .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px 0;
+    min-width: 150px;
+    display: none;
+    z-index: 1000;
+  }
+  
+  .nav-user:hover .nav-dropdown {
+    display: block;
+  }
+  
+  .dropdown-item {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    margin: 5px 0;
+    transition: all 0.3s;
+  }
+  
+  .mobile-menu {
+    display: none;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-link {
+    display: block;
+    padding: 15px 0;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .mobile-link:last-child {
+    border-bottom: none;
+  }
+  
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+    
+    .mobile-menu-toggle {
+      display: block;
+    }
+    
+    .mobile-menu.active {
+      display: block;
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 6px);
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -6px);
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    mobileMenuToggle.addEventListener('click', function() {
+      mobileMenuToggle.classList.toggle('active');
+      mobileMenu.classList.toggle('active');
+    });
+  });
+</script>

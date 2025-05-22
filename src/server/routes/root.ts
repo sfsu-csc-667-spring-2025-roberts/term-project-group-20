@@ -1,11 +1,16 @@
-import express from "express";
-const router = express.Router();
+import express from "express"
+import type { Request, Response } from "express"
 
-router.get("/", (_request, response) => {
-  response.render("root", {
-    title: "group 20 site",
-    name: "group 20 site",
-  });
-});
+const router = express.Router()
 
-export default router;
+router.get("/", (request: Request, response: Response) => {
+  // @ts-ignore
+  if (request.session.user) {
+    response.redirect("/lobby")
+    return
+  }
+
+  response.render("root")
+})
+
+export default router

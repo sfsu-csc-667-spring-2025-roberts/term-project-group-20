@@ -1,0 +1,488 @@
+/* Game styles */
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 20px;
+    height: calc(100vh - 100px);
+  }
+  
+  .game-header {
+    grid-column: 1 / span 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .game-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .game-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .status-active {
+    background-color: #52c41a;
+  }
+  
+  .status-inactive {
+    background-color: #ff4d4f;
+  }
+  
+  .game-main {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .players-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+  }
+  
+  .player-card {
+    width: 150px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  
+  .player-card.current-player {
+    border: 2px solid #1890ff;
+  }
+  
+  .player-card.you {
+    border: 2px solid #52c41a;
+  }
+  
+  .player-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .player-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center;
+    word-break: break-all;
+  }
+  
+  .player-cards-count {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .current-turn-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #1890ff;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  
+  .you-badge {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background-color: #52c41a;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  
+  .game-board {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .play-area {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 30px;
+  }
+  
+  .deck,
+  .discard-pile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .area-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .card {
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .card-back {
+    background-color: #333;
+    color: white;
+    background-image: url("/images/card-back.png");
+    background-size: cover;
+  }
+  
+  .card.red {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .card.blue {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .card.green {
+    background-color: #52c41a;
+    color: white;
+  }
+  
+  .card.yellow {
+    background-color: #fadb14;
+    color: black;
+  }
+  
+  .card.wild {
+    background: linear-gradient(45deg, #ff4d4f, #1890ff, #52c41a, #fadb14);
+    color: white;
+  }
+  
+  .hand-section {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+  }
+  
+  .hand-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .hand-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .chat-section {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .chat-header {
+    padding: 15px;
+    background-color: #1890ff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .message {
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-break: break-word;
+  }
+  
+  .message.other {
+    background-color: #f0f0f0;
+    align-self: flex-start;
+  }
+  
+  .message.self {
+    background-color: #e6f7ff;
+    align-self: flex-end;
+  }
+  
+  .message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .message-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  
+  .message-sender {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .message-time {
+    font-size: 10px;
+  }
+  
+  .message-content {
+    font-size: 14px;
+  }
+  
+  .chat-input {
+    display: flex;
+    padding: 10px;
+    background-color: white;
+    border-top: 1px solid #ddd;
+  }
+  
+  .chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  
+  .chat-input button {
+    padding: 8px 15px;
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .game-actions {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+  }
+  
+  .btn-success {
+    background-color: #52c41a;
+    color: white;
+  }
+  
+  .btn-danger {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .color-picker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+  }
+  
+  .color-picker.active {
+    display: block;
+  }
+  
+  .color-picker-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .color-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .color-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .color-option:hover {
+    transform: scale(1.1);
+  }
+  
+  .color-red {
+    background-color: #ff4d4f;
+  }
+  
+  .color-blue {
+    background-color: #1890ff;
+  }
+  
+  .color-green {
+    background-color: #52c41a;
+  }
+  
+  .color-yellow {
+    background-color: #fadb14;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+  }
+  
+  .overlay.active {
+    display: block;
+  }
+  
+  .winner-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+    display: none;
+  }
+  
+  .winner-modal.active {
+    display: block;
+  }
+  
+  .winner-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .winner-message {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .winner-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  @media (max-width: 768px) {
+    .game-container {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr auto auto;
+    }
+  
+    .game-header {
+      grid-column: 1;
+    }
+  
+    .game-main {
+      grid-row: 3;
+    }
+  
+    .chat-section {
+      grid-column: 1;
+      grid-row: 4;
+      height: 300px;
+    }
+  
+    .game-actions {
+      grid-column: 1;
+      grid-row: 5;
+    }
+  
+    .play-area {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  

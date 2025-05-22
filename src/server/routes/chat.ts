@@ -1,37 +1,56 @@
-import express from "express";
-import { Request, Response } from "express";
-//import { ChatMessage } from "global";
+import express, { type Request, type Response } from "express"
+import db from "../db/connection"
+import auth from "../middleware/auth"
 
-const router = express.Router();
+const router = express.Router()
 
-router.post("/:roomId", (request: Request, response: Response) => {
-  const { roomId } = request.params;
-  const { message } = request.body;
-  // @ts-ignore
-  const { id, email, gravatar } = request.session.user;
-  const io = request.app.get("io");
+// Get chat messages for a game
+router.get("/:gameId", auth, async (req: Request, res: Response): Promise<void> => {
+  const gameId = req.params.gameId
 
-  if (!io) {
-    response.status(500).send("Socket.io not initialized");
-    return;
+  try {
+    // Get chat messages
+    const messages = await db.manyOrNone(
+      `
+      SELECT cm.*, u.email, u.gravatar
+      FROM chat_messages cm
+      JOIN users u ON cm.user_id = u.id
+      WHERE cm.game_id = $1
+      ORDER BY cm.created_at ASC
+    `,
+      [gameId],
+    )
+
+    res.json(messages)
+  } catch (error) {
+    console.error("Error getting chat messages:", error)
+    res.status(500).json({ error: "Failed to get chat messages" })
   }
+})
 
-  if (!message) {
-    response.status(400).send("Message is required");
-    return;
+// Send a chat message
+router.post("/:gameId", auth, async (req: Request, res: Response): Promise<void> => {
+  const gameId = req.params.gameId
+  const { message } = req.body
+
+  try {
+    // @ts-ignore
+    const userId = req.session.user.id
+
+    // Save message to database
+    await db.none(
+      `
+      INSERT INTO chat_messages (user_id, game_id, message)
+      VALUES ($1, $2, $3)
+    `,
+      [userId, gameId, message],
+    )
+
+    res.json({ success: true })
+  } catch (error) {
+    console.error("Error sending chat message:", error)
+    res.status(500).json({ error: "Failed to send chat message" })
   }
+})
 
-  io.emit(`chat:message:${roomId}`, {
-    message,
-    sender: {
-      id,
-      email,
-      gravatar,
-    },
-    timestamp: new Date(),
-  });
-
-  response.status(200).send();
-});
-
-export default router;
+export default router
