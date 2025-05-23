@@ -863,11 +863,58 @@ ${frame.code}`;
       function (require, module, exports, __globalThis) {
         var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
         parcelHelpers.defineInteropFlag(exports);
+        parcelHelpers.export(exports, "joinGameRoom", () => joinGameRoom);
+        parcelHelpers.export(exports, "joinLobbyChat", () => joinLobbyChat);
+        parcelHelpers.export(exports, "sendChatMessage", () => sendChatMessage);
+        parcelHelpers.export(
+          exports,
+          "sendLobbyMessage",
+          () => sendLobbyMessage,
+        );
+        parcelHelpers.export(exports, "playCard", () => playCard);
+        parcelHelpers.export(exports, "drawCard", () => drawCard);
+        parcelHelpers.export(exports, "startGame", () => startGame);
         parcelHelpers.export(exports, "socket", () => socket);
         var _socketIoClient = require("socket.io-client");
         var _socketIoClientDefault =
           parcelHelpers.interopDefault(_socketIoClient);
         const socket = (0, _socketIoClientDefault.default)();
+        const joinGameRoom = (gameId) => {
+          socket.emit("join-game", {
+            gameId,
+          });
+        };
+        const joinLobbyChat = () => {
+          socket.emit("join-lobby");
+        };
+        const sendChatMessage = (gameId, message) => {
+          socket.emit("chat-message", {
+            gameId,
+            message,
+          });
+        };
+        const sendLobbyMessage = (message) => {
+          socket.emit("lobby-message", {
+            message,
+          });
+        };
+        const playCard = (gameId, cardId, chosenColor) => {
+          socket.emit("play-card", {
+            gameId,
+            cardId,
+            chosenColor,
+          });
+        };
+        const drawCard = (gameId) => {
+          socket.emit("draw-card", {
+            gameId,
+          });
+        };
+        const startGame = (gameId) => {
+          socket.emit("start-game", {
+            gameId,
+          });
+        };
       },
       {
         "socket.io-client": "8HBJR",
