@@ -1,0 +1,280 @@
+<%- include('./shared/head') %>
+
+<div class="game-room-container">
+  <div class="game-room-header">
+    <h1><%= game.name %></h1>
+    <p><%= game.started ? 'Game in Progress' : 'Waiting for Players' %></p>
+  </div>
+
+  <div class="game-room-content">
+    <div class="game-panel">
+      <h2>Players</h2>
+      <ul class="player-list" id="player-list">
+        <!-- Rendered by JS -->
+      </ul>
+      <% if (!game.started && isCreator) { %>
+        <button id="start-game" class="btn btn-primary">Start Game</button>
+      <% } %>
+    </div>
+
+    <div class="game-panel">
+      <h2>Your Hand</h2>
+      <div class="card-hand" id="player-hand">
+        <!-- Cards rendered here -->
+      </div>
+      <button id="draw-card" class="btn btn-primary">Draw Card</button>
+    </div>
+
+    <div class="game-panel">
+      <h2>Top Discard</h2>
+      <div class="card" id="discard-pile">
+        <!-- Top card rendered here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="notification" class="game-notification"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const socket = io();
+
+    const gameId = "<%= game.id %>";
+    const currentUserId = <%= currentUserId %>;
+
+    let selectedCardId = null;
+
+    const handEl = document.getElementById("player-hand");
+    const drawBtn = document.getElementById("draw-card");
+    const startBtn = document.getElementById("start-game");
+    const discardPile = document.getElementById("discard-pile");
+    const playerList = document.getElementById("player-list");
+    const notification = document.getElementById("notification");
+
+    socket.emit("join-game", { gameId });
+
+    if (startBtn) {
+      startBtn.addEventListener("click", () => {
+        socket.emit("start-game", { gameId });
+      });
+    }
+
+    if (drawBtn) {
+      drawBtn.addEventListener("click", () => {
+        socket.emit("draw-card", { gameId });
+      });
+    }
+
+    socket.on("game-started", () => {
+      showNotification("Game started!");
+    });
+
+    socket.on("hand-update", data => {
+      renderHand(data.hand, data.isYourTurn);
+    });
+
+    socket.on("game-state-update", data => {
+      renderPlayers(data.players, data.currentPlayer);
+      renderTopCard(data.topCard);
+    });
+
+    socket.on("game-over", data => {
+      if (data.winnerId === currentUserId) {
+        showNotification("🎉 You won!");
+      } else {
+        showNotification("Game over. Another player won.");
+      }
+
+      setTimeout(() => {
+        window.location.href = "/lobby";
+      }, 4000);
+    });
+
+    socket.on("error", data => {
+      showNotification(data.message || "An error occurred");
+    });
+
+    function renderHand(cards, isYourTurn) {
+      handEl.innerHTML = "";
+      cards.forEach(card => {
+        const cardBtn = document.createElement("button");
+        cardBtn.className = `card-btn card-${card.color}`;
+        cardBtn.textContent = formatCardLabel(card.value);
+        cardBtn.disabled = !isYourTurn;
+
+        cardBtn.addEventListener("click", () => {
+          if (card.color === "wild" || card.value === "wild_draw_four") {
+            const color = prompt("Choose a color (red, blue, green, yellow):");
+            if (["red", "blue", "green", "yellow"].includes(color)) {
+              socket.emit("play-card", {
+                gameId,
+                cardId: card.id,
+                chosenColor: color,
+              });
+            } else {
+              showNotification("Invalid color.");
+            }
+          } else {
+            socket.emit("play-card", { gameId, cardId: card.id });
+          }
+        });
+
+        handEl.appendChild(cardBtn);
+      });
+    }
+
+    function renderTopCard(card) {
+      if (!card) {
+        discardPile.innerHTML = "<em>No card yet</em>";
+        return;
+      }
+
+      discardPile.className = `card card-${card.color}`;
+      discardPile.textContent = formatCardLabel(card.value);
+    }
+
+    function renderPlayers(players, currentPlayerId) {
+      playerList.innerHTML = "";
+      players.forEach(p => {
+        const li = document.createElement("li");
+        li.className = `player-item ${p.user_id === currentPlayerId ? "current" : ""}`;
+        li.innerHTML = `
+          <img src="${p.gravatar}" class="player-avatar">
+          <div class="player-info">
+            <span class="player-name">${p.email}</span>
+            ${p.user_id === currentPlayerId ? '<span class="turn-indicator">⟲ Turn</span>' : ""}
+          </div>
+        `;
+        playerList.appendChild(li);
+      });
+    }
+
+    function formatCardLabel(value) {
+      switch (value) {
+        case "wild": return "W";
+        case "wild_draw_four": return "+4";
+        case "draw_two": return "+2";
+        case "skip": return "⛔";
+        case "reverse": return "⟲";
+        default: return value;
+      }
+    }
+
+    function showNotification(message) {
+      notification.textContent = message;
+      notification.style.display = "block";
+      setTimeout(() => notification.style.display = "none", 3000);
+    }
+  });
+</script>
+
+<style>
+  .game-room-container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 40px 20px;
+  }
+
+  .game-room-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .game-room-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  .game-panel {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .player-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .player-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .card-hand {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-btn {
+    width: 60px;
+    height: 90px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .card-red { background-color: #ff4d4f; color: white; }
+  .card-blue { background-color: #1890ff; color: white; }
+  .card-green { background-color: #52c41a; color: white; }
+  .card-yellow { background-color: #fadb14; color: black; }
+  .card-wild {
+    background: linear-gradient(45deg, #ff4d4f, #1890ff, #52c41a, #fadb14);
+    color: white;
+  }
+
+  .card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 120px;
+    font-weight: bold;
+    font-size: 24px;
+    border-radius: 10px;
+  }
+
+  .btn {
+    margin-top: 15px;
+    padding: 10px 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+  }
+
+  .game-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    z-index: 1000;
+    display: none;
+  }
+</style>
+
+<%- include('./shared/menu') %>
