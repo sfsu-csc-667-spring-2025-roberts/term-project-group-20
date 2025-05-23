@@ -1,6 +1,7 @@
 <%- include('./shared/head') %>
 
-<div class="lobby-container">
+<div class="lobby-container" style="display: flex; gap: 20px;">
+  <div class="lobby-left" style="flex: 2;">
   <div class="lobby-header">
     <h1>Game Lobby</h1>
     <p>Join an existing game or create a new one</p>
@@ -85,6 +86,17 @@
     </div>
   </div>
 </div>
+</div> 
+
+<!-- Chat -->
+<div class="lobby-chat" style="flex: 1; border-left: 1px solid #ddd; padding-left: 20px;">
+  <h2>Lobby Chat</h2>
+  <div id="chat-messages" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f9f9f9;"></div>
+  <form id="chat-form">
+    <input type="text" id="chat-input" placeholder="Type a message..." style="width: 100%; padding: 10px; box-sizing: border-box;" />
+  </form>
+</div>
+
 
 <!-- Password Modal -->
 <div id="password-modal" class="modal">
@@ -241,6 +253,24 @@
       }
     }
   });
+
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const chatMessages = document.getElementById('chat-messages');
+
+chatForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const message = chatInput.value.trim();
+  if (message) {
+    const msgElem = document.createElement('div');
+    msgElem.textContent = `Player: ${message}`;
+    chatMessages.appendChild(msgElem);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatInput.value = '';
+    
+  }
+});
+
 </script>
 
 <style>
@@ -557,7 +587,55 @@
     .game-actions .btn {
       width: 100%;
     }
+    .lobby-chat {
+      flex: 1;
+      padding-left: 20px;
+      border-left: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lobby-chat h2 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    #chat-messages {
+      flex: 1;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background: #f8f8f8;
+      margin-bottom: 10px;
+      font-size: 0.95em;
+      line-height: 1.4;
+      border-radius: 4px;
+    }
+
+    #chat-messages div {
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: #e1eaff;
+      border-radius: 6px;
+      max-width: 80%;
+    }
+
+    #chat-form {
+      display: flex;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
   }
+}
+
 </style>
 
 <%- include('./shared/menu') %>
