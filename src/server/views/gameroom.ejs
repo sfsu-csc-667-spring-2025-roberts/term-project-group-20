@@ -39,6 +39,27 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+    const chatMessages = document.getElementById("chat-messages");
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (message) {
+        socket.emit("chat-message", { gameId, message });
+        chatInput.value = "";
+      }
+    });
+
+    socket.on("chat-message", ({ user, message }) => {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = "chat-message";
+      msgDiv.textContent = `${user}: ${message}`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
     const socket = io();
 
     const gameId = "<%= game.id %>";
@@ -275,6 +296,61 @@
     z-index: 1000;
     display: none;
   }
+  .chat-box {
+  margin-top: 40px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chat-messages {
+  height: 300px;
+  overflow-y: auto;
+  background: white;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.chat-message {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+#chat-form {
+  display: flex;
+  gap: 10px;
+}
+
+#chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#chat-form button {
+  padding: 10px 16px;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 </style>
+
+<div class="chat-box">
+  <div id="chat-messages" class="chat-messages"></div>
+  <form id="chat-form">
+    <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
+</div>
 
 <%- include('./shared/menu') %>

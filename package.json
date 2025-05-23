@@ -1,6 +1,6 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "term-project-group-20",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "tsc",
@@ -14,6 +14,9 @@
     "db:create": "node-pg-migrate create -j ts --",
     "db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js up -j ts",
     "db:rollback": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js down -j ts"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
