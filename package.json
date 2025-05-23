@@ -1,7 +1,6 @@
 {
   "name": "term-project-group-20",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --exec ts-node src/server/index.ts",
